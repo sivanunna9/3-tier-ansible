@@ -1,0 +1,6 @@
+---
+# vars file for good-ansible
+packages:
+  - haproxy
+haproxy_cfg: /etc/haproxy/haproxy.cfg
+haproxy_group: apps

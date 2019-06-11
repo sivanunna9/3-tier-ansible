@@ -1,0 +1,8 @@
+- name: Deploy load balancer servers
+  become: true
+  hosts: tag_AnsibleGroup_frontends
+  gather_facts: false
+  roles:
+    - {name: base-config, tags: base-config}
+    - {name: lb-tier, haproxy_group: tag_AnsibleGroup_apps, tags: [lb-tier, lbs, HAProxy]}
+

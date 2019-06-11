@@ -1,0 +1,10 @@
+---
+
+- name: Deploy PostgreSQL server
+  become: true
+  hosts: tag_AnsibleGroup_appdbs
+  gather_facts: false
+  roles:
+    - {name: base-config, tags: base-config}
+    - {name: db-tier, tags: [db-tier, dbs, PostgreSQL]}
+

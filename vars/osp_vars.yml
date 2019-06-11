@@ -1,0 +1,111 @@
+---
+cloud_name: ospcloud
+osp_networks:
+  - name: ext_network
+    external: true
+    subnet:
+      name: ext_subnet
+      cidr: '10.10.10.0/24'
+      dns_nameservers:
+        - '8.8.8.7'
+        - '8.8.8.8'
+      host_routes:
+        - destination: '0.0.0.0/0'
+          nexthop: '10.10.10.0'
+        - destination: '192.168.0.0/24'
+          nexthop: '192.168.0.0'
+  - name: int_network
+    external: false
+    subnet:
+      name: int_subnet
+      cidr: '20.20.20.0/24'
+      dns_nameservers:
+        - '8.8.8.7'
+        - '8.8.8.8'
+      host_routes:
+        - destination: '0.0.0.0/0'
+          nexthop: '192.168.0.0'
+        - destination: '192.168.0.0/24'
+          nexthop: '192.168.0.0'
+osp_routers:
+  - name: router1
+    network: ext_network
+    external_fixed_ips:
+      subnet: ext_subnet
+    interfaces:
+      - int_subnet
+osp_securitygroups:
+  - name: app_servers
+    rules:
+      - protocol: tcp
+        port_range_min: '22'
+        port_range_max: '22'
+        remote_ip_prefix: '0.0.0.0/0'
+      - protocol: tcp
+        port_range_min: '8080'
+        port_range_max: '8080'
+        remote_ip_prefix: '0.0.0.0/0'
+  - name: frontend_servers
+    rules:
+      - protocol: tcp
+        port_range_min: '22'
+        port_range_max: '22'
+        remote_ip_prefix: '0.0.0.0/0'
+      - protocol: tcp
+        port_range_min: '80'
+        port_range_max: '80'
+        remote_ip_prefix: '0.0.0.0/0'
+      - protocol: tcp
+        port_range_min: '443'
+        port_range_max: '443'
+        remote_ip_prefix: '0.0.0.0/0'
+  - name: db_servers
+    rules:
+      - protocol: tcp
+        port_range_min: '22'
+        port_range_max: '22'
+        remote_ip_prefix: '0.0.0.0/0'
+      - protocol: tcp
+        port_range_min: '5432'
+        port_range_max: '5432'
+        remote_ip_prefix: '20.20.20.0/24'
+osp_flavors:
+  m2.small:
+    state: present
+    ram: '2048'
+    vcpus: '1'
+    disk: '10'
+osp_servers:
+  - name: app1
+    state: present
+    group: apps
+    deployment: dev
+    security_group_name: app_servers
+    key_name: ansible_ssh
+    int_network: int_network
+    ext_network: ext_network
+  - name: app2
+    state: present
+    group: apps
+    deployment: dev
+    security_group_name: app_servers
+    key_name: ansible_ssh
+    int_network: int_network
+    ext_network: ext_network
+  - name: db
+    state: present
+    group: appdbs
+    deployment: dev
+    security_group_name: db_servers
+    key_name: ansible_ssh
+    int_network: int_network
+    ext_network: ext_network
+  - name: frontend
+    state: present
+    group: frontends
+    deployment: dev
+    security_group_name: frontend_servers
+    key_name: ansible_ssh
+    int_network: int_network
+    ext_network: ext_network
+...

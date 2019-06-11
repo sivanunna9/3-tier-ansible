@@ -1,0 +1,19 @@
+- name: Smoke test the 3 Tier application
+  hosts: 54.172.164.255
+  #hosts: tag_Name_bastions
+  gather_facts: false
+  tasks:
+    - name: Check frontend(s) is responding on port 80
+      uri:
+        url: "http://{{ item }}"
+        return_content: yes
+      register: webpage
+      with_items:
+        - "{{ groups['tag_AnsibleGroup_frontends'] }}"
+
+    - name: Fail if the page content does not have <Ansible has done its job>
+      fail:
+      when: '"Ansible has done its job - Welcome to Tomcat" not in item.content'
+      with_items: "{{ webpage.results }}"
+
+

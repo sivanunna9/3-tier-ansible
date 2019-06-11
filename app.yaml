@@ -1,0 +1,8 @@
+- name: Deploy application servers
+  become: true
+  hosts: tag_AnsibleGroup_apps
+  gather_facts: false
+  roles:
+    - {name: base-config, tags: base-config}
+    - {name: app-tier, tags: [app-tier, apps, Tomcat]}
+

@@ -1,0 +1,42 @@
+---
+cloud_name: ospcloud
+osp_flavors:
+  m2.small:
+    state: absent
+    ram: '2048'
+    vcpus: '1'
+    disk: '10'
+osp_servers:
+  - name: app1
+    state: absent
+    group: apps
+    deployment: dev
+    security_group_name: app_servers
+    key_name: ansible_ssh
+    int_network: int_network
+    ext_network: ext_network
+  - name: app2
+    state: absent
+    group: apps
+    deployment: dev
+    security_group_name: app_servers
+    key_name: ansible_ssh
+    int_network: int_network
+    ext_network: ext_network
+  - name: db
+    state: absent
+    group: appdbs
+    deployment: dev
+    security_group_name: db_servers
+    key_name: ansible_ssh
+    int_network: int_network
+    ext_network: ext_network
+  - name: frontend
+    state: absent
+    group: frontends
+    deployment: dev
+    security_group_name: frontend_servers
+    key_name: ansible_ssh
+    int_network: int_network
+    ext_network: ext_network
+...

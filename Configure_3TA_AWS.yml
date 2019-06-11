@@ -1,0 +1,44 @@
+---
+
+- name: Deploy PostgreSQL server
+  become: true
+  hosts: tag_AnsibleGroup_appdbs
+  gather_facts: false
+  roles:
+    - {name: base-config, tags: base-config}
+    - {name: db-tier, tags: [db-tier, dbs, PostgreSQL]}
+
+- name: Deploy application servers
+  become: true
+  hosts: tag_AnsibleGroup_apps
+  gather_facts: false
+  roles:
+    - {name: base-config, tags: base-config}
+    - {name: app-tier, tags: [app-tier, apps, Tomcat]}
+
+- name: Deploy load balancer servers
+  become: true
+  hosts: tag_AnsibleGroup_frontends
+  gather_facts: false
+  roles:
+    - {name: base-config, tags: base-config}
+    - {name: lb-tier, haproxy_group: tag_AnsibleGroup_apps, tags: [lb-tier, lbs, HAProxy]}
+
+- name: Smoke test the 3 Tier application
+  hosts: tag_AnsibleGroup_bastions
+  gather_facts: false
+  tasks:
+    - name: Check frontend(s) is responding on port 80
+      uri:
+        url: "http://{{ item }}"
+        return_content: yes
+      register: webpage
+      with_items:
+        - "{{ groups['tag_AnsibleGroup_frontends'] }}"
+
+    - name: Fail if the page content does not have <Ansible has done its job>
+      fail:
+      when: '"Ansible has done its job - Welcome to Tomcat" not in item.content'
+      with_items: "{{ webpage.results }}"
+
+...

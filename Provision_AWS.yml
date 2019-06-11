@@ -1,0 +1,13 @@
+---
+
+- name: Provision AWS infrastructure for the 3-tier app playbook
+  hosts: bastion
+  vars_files:
+    - vars/aws_vars.yml
+  roles:
+    - {name: aws-instances, tags: aws-ec2}
+  tasks:
+    - name: sleep for 10 minutes for AWS environment to start
+      wait_for: timeout=600
+      delegate_to: "{{ inventory_hostname }}"
+...
