@@ -1,0 +1,7 @@
+---
+- hosts: tag_Name_master
+  #connection: local
+  remote_user: ubuntu
+  become: true
+  tasks:
+

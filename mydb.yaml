@@ -1,0 +1,7 @@
+---
+- hosts: tag_Name_tomcatmysql
+  become: yes
+  gather_facts: yes
+  roles:
+    - mysql
+

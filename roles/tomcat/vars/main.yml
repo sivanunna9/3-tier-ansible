@@ -1,0 +1,5 @@
+---
+# vars file for tomcat
+tomcat_source: /home/ubuntu/distros/tomcat #MySQL Root Password
+tomcat_target: root
+

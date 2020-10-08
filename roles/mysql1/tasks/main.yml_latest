@@ -1,0 +1,78 @@
+# tasks file for mysql
+---
+ - name: Make sure update is present
+   shell: apt-get update
+ - name: Make sure pip is present
+   shell: apt-get -y  install python-pip  
+
+ - name: Make sure pymysql is present
+   become: true # needed if the other tasks are not played as root
+   pip:
+    name: pymysql
+    state: present
+ - name: Install the MySQL packages
+   apt: name={{ item }} state=latest update_cache=yes
+   with_items:
+     - mysql-server
+     - mysql-client
+     - python-mysqldb
+     - libmysqlclient-dev
+ 
+       # - name: Retrieve stuff from mysql
+       # become: true # needed if the other tasks are not played as root
+       #command: >
+       #sudo mysql --user=root --password=root mysql
+       #--host=127.0.0.1 --batch --skip-column-names
+       # --execute="UPDATE user SET plugin='mysql_native_password' WHERE User='root';"
+       #login_unix_socket: /var/run/mysqld/mysqld.sock
+       #check_mode: no
+       #changed_when: False
+       # - name: Get  user
+       # shell: |
+       #sudo mysql -u root -p 'root' -NBe "UPDATE user SET plugin='mysql_native_password' WHERE User='root';"",exit"
+       # failed_when: no
+       #changed_when: no
+
+ - name: Copy file with owner and permission, using symbolic representation
+   template:
+    src: mysqldb.sh
+    dest: /home/ubuntu/mysqldb.sh
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+
+ - name: Execute the command in remote shell; stdout goes to the specified file on the remote.
+   command: /home/ubuntu/mysqldb.sh >> somelog1.txt
+
+
+ - name: update mysql root password for all root accounts from local servers
+   become: true # needed if the other tasks are not played as root
+   mysql_user: login_user=root 
+       login_password={{ current_password }} 
+       name=root 
+       host=% 
+       password={{ new_password }} 
+       priv=*.*:ALL,GRANT
+ - name: restart mysql service
+   command: sudo service mysql restart
+   #login_unix_socket: /var/run/mysqld/mysqld.sock
+
+       # - name: Ensure Anonymous user(s) are not in the database
+       # mysql_user: name='' host={{ item }} state=absent
+       #   with_items:
+       #- localhost
+       # - "{{ ansible_hostname }}"
+
+       #- name: Remove the test database
+       #   mysql_db: name=test state=absent
+       #  notify:
+       #- Restart MySQL
+
+       #- copy: src=tender.sql.bz2 dest=/tmp
+       # - mysql_db: name=my_db state=import target=/tmp/tender.sql.bz2
+
+
+
+
+
+

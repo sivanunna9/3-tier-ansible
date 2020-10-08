@@ -1,0 +1,5 @@
+---
+# vars file for mysql
+mysql_root_pass: root #MySQL Root Password
+current_password: root
+new_password: root

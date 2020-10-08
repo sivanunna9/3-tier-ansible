@@ -1,0 +1,50 @@
+---
+- hosts: tag_Name_test
+  #connection: local
+  remote_user: ubuntu
+  become: true
+  tasks:
+
+     - name: Check that the /home/distros folder exists
+       stat:
+         path: /home/ubuntu/distros/tomcat
+       register: stat_result
+
+     - name: Create the file, if it doesnt exist already
+       file:
+         path: /home/ubuntu/distros/tomcat
+         state: directory
+       when: not stat_result.stat.exists
+
+     - name: Install java
+       apt: 
+         name: openjdk-8-jdk
+
+     - name: Check that the download tomcat exists
+       stat:
+         path: /home/ubuntu/distros/tomcat/apache-tomcat-8.5.57.tar.gz
+       register: stat_result1
+
+     - name: download file with custom HTTP headers
+       get_url:
+         url: http://apachemirror.wuchna.com/tomcat/tomcat-8/v8.5.57/bin/apache-tomcat-8.5.57.tar.gz
+         dest: /home/ubuntu/distros/tomcat
+       when: not stat_result1.stat.exists
+
+     - name: Extract the Tomcat
+       unarchive:
+        src: /home/ubuntu/distros/tomcat/apache-tomcat-8.5.57.tar.gz
+        dest: /home/ubuntu/distros/tomcat/
+        remote_src: yes
+
+     - name: Copy Tomcat service from local to remote
+       copy:
+         src: tomcat.service
+         dest: /etc/systemd/system/
+         mode: 0755
+     - name: Start and enable Tomcat service
+       systemd:
+         name: tomcat
+         state: started
+         # enabled: true
+         daemon_reload: true

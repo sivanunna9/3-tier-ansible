@@ -1,0 +1,25 @@
+---
+- hosts: tag_Name_test
+  #connection: local
+  remote_user: ubuntu
+  become: true
+  tasks:
+     - name: Stop service tomcat, if started
+       service:
+         name: tomcat
+         state: stopped
+     - name: Copy war file
+       copy: src=/home/siva/.jenkins/workspace/tender-management/tendermanagement/target/tendermanagement-0.0.1-SNAPSHOT.war dest=/home/ubuntu
+     - name: Copy file with owner and permission, using symbolic representation
+       copy:
+         src: deployment.sh
+         dest: /home/ubuntu/deployment.sh
+         owner: root
+         group: root
+         mode: u=rwx,g=rx,o=rx
+     - name: Execute the command in remote shell; stdout goes to the specified file on the remote.
+       command: /home/ubuntu/deployment.sh >> somelog.txt
+     - name: Restart service tomcat, in all cases
+       service:
+         name: tomcat
+         state: started

@@ -1,0 +1,6 @@
+---
+- hosts: tag_Name_test
+  become: yes
+  gather_facts: yes
+  roles:
+    - mysql1
