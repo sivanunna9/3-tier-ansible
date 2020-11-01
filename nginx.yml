@@ -1,0 +1,7 @@
+---
+- hosts: tag_Name_master
+  become: yes
+  gather_facts: no
+  roles:
+    - deploy-kiran
+    - nginx
