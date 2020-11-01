@@ -1,0 +1,35 @@
+---
+# tasks file for nginx
+ - name: Make sure update is present
+   shell: apt-get update
+ - name: Install the nginx
+   apt: name={{ item }} state=latest update_cache=yes
+   with_items:
+     - nginx
+     - awscli
+ - name: copy the nginx file
+   copy:
+         src: frontend.conf
+         dest: /etc/nginx/conf.d/
+ - name: Remove the build_old folder
+   shell: rm -rf /var/www/html/build_old
+
+ - name: Rename the build folder
+   shell: mv /var/www/html/build /var/www/html/build_old 
+ - name: copy the build folder
+   copy:
+         src: build.tar.gz
+         dest: /var/www/html
+ - name: Extract the build
+   unarchive:
+         src: /var/www/html/build.tar.gz
+         dest: /var/www/html/
+         remote_src: yes
+ - name: chnge permissions
+   shell: chmod -R 755 /var/www/html/build 
+
+ - name: Restart the nginx
+   service:
+         name: nginx
+         state: restarted
+
