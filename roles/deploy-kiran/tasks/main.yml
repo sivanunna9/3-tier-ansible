@@ -1,0 +1,11 @@
+---
+# tasks file for deploy-kiran
+
+ - name: copy the file
+   copy: 
+         src: depoly.sh
+         dest: /home/ubuntu
+         mode: 0744
+
+ - name: Execute the deploy script
+   shell: /home/ubuntu/depoly.sh {{ my_var }}
